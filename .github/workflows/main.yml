@@ -4,6 +4,10 @@ on:
   push:
     branches: ["main"]
 
+permissions:
+  contents: read
+  id-token: write   # ⭐ 必须
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -12,24 +16,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 1️⃣ 用 Node 构建前端
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Install deps
+      - name: Install dependencies
         run: npm ci
 
       - name: Build
         run: npm run build
 
-      # 2️⃣ 部署到 Deno Deploy
-      - name: Deploy
+      - name: Deploy to Deno Deploy
         uses: denoland/deployctl@v1
         with:
           project: lianghua
           entrypoint: main.ts
           root: .
-        env:
-          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
